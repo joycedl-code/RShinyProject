@@ -1,6 +1,8 @@
 
 
 
+library(ggplot2)
+library(dplyr)
 
 library(tidyverse)
 library(scales)
@@ -46,5 +48,4 @@ cast <- S007_credit %>%
 
 
 
-glimpse(S007)
 

@@ -1,50 +1,44 @@
-
+library(ggvis)
 library(shiny)
 library(shinyWidgets)
+#install.packages("shinythemes")
+library(shinythemes)
+library(DT)
 
-
-shinyUI(fluidPage(
+shinyUI(fluidPage(theme=shinytheme("cyborg"),tagList(
+    tags$head(tags$script(type="text/javascript", src ="code.js"),
+              
+    )),
     navbarPage(
-        
        title="James Bond Performance",
            
         tabPanel("Movie Comparsion ",
                  
                  # Sidebar with a slider input for number of bins
                  sidebarLayout(
-                     sidebarPanel(
+                     sidebarPanel(width=3,
                          h4("Filter"),
+                         sliderInput("rating", "Movie average Rating",
+                                     5.7, 10, 5.7, step = 0.1),
                          
-                         sliderInput("year", "Year released", 1940, 2014, value = c(1970, 2014),
+                         sliderInput("year", "Year released", 1962, 2015, value = c(1962, 2015),
                                      sep = ""),
-                         sliderInput("budget", "Budget (millions)", 0, 800, c(0, 800), step = 1),
-                         sliderInput("boxoffice", "Dollars at Box Office (millions)",
-                                     0, 800, c(0, 800), step = 1),
-                         awesomeCheckbox(
-                             inputId = "aw",
-                             label = "Award?", 
-                             value = TRUE
+                         sliderInput("budget", "Budget (millions)", 0, 300, c(0, 300)),
+                         sliderInput("revenue", "Revenue (millions)",
+                                     0, 1200, c(0, 1200)),
+                         wellPanel(
+                             selectInput("xvar", "X-axis variable", axis_vars, selected = "budget"),
+                             selectInput("yvar", "Y-axis variable", axis_vars, selected = "revenue"),
+                          
                          )
                         ),
                      
                      mainPanel(
                          fluidPage(fluidRow(
-                             column(6,
-                                    plotOutput(
-                                        "plot", width = "700px", height = "600px"
-                                    )),
-                             column(6,
-                                    DT::dataTableOutput("dataSet"),
-                                    fluidRow(
-                                        column(3, offset = 3,
-                                               br(),
-                                        ),
-                                        column(3, offset = 3,
-                                               img(src="007Logo.png",
-                                                 height=50,width=100 )
-                                        )))
-                             
-                         ))
+                         
+                                    ggvisOutput(
+                                        "plot")
+         ),fluidRow(DT::dataTableOutput("dataSet") ))
                          
                      )
                  )
@@ -52,57 +46,72 @@ shinyUI(fluidPage(
         tabPanel("The Bonds", 
                  sidebarLayout(
                      sidebarPanel(
-                         h4("Actors"),
-                         
-                         selectInput(
-                             "select",
-                             h4("Which Era of 007?"),
+                     
+            
+                         checkboxGroupInput(
+                             inputId = "checkGroup",
+                             h4("Actors"),
                              choices = list(
-                                 " "=" ",
-                                 "Sean Connery" = 1,
-                                 "David Niven" = 2,
-                                 "George Lazenby" = 3,
-                                 "Roger Moore" = 4,
-                                 "Timothy Dalton" = 5,
-                                 "Pierce Brosnan" = 6,
-                                 "Daniel Craig" = 7
-                                 
+                              
+                                 'Daniel Craig'='Daniel.Craig',
+                                 'George Lazenby'= 'George.Lazenby',
+                                 'Pierce Brosnan'='Pierce.Brosnan',
+                                 'Roger Moore'='Roger.Moore',
+                                 'Sean Connery'='Sean.Connery',
+                                 'Timothy Dalton'='Timothy.Dalton'
                              ),
-                             selected = " "
-                         )
+                             selected =  c('Daniel.Craig',
+                                           'George.Lazenby',
+                                           'Pierce.Brosnan',
+                                           'Roger.Moore',
+                                           'Sean.Connery',
+                                           'Timothy.Dalton')
+                         ),
+                         uiOutput("selected_num")
                      ),
                      
                      mainPanel(
                          fluidPage(fluidRow(
-                             column(6,
+                          
                                     plotOutput(
-                                        "graph", width = "700px", height = "600px"
-                                    )),
-                             column(6,
-                                    DT::dataTableOutput("actor"),
-                                    fluidRow(
-                                        column(3, offset = 3,
-                                               br(),
-                                        ),
-                                        column(3, offset = 3,
-                                               imageOutput("myImage") )
-                                        )))
-                             
+                                        "radarplot", width = "700px", height = "600px"
+                                    ))
                          ))
-                         
-                     )
-                 ),
-        tabPanel("007 Elements", fluidPage(fluidRow(
+                     )),
+             
+       navbarMenu("007 Elements",
+                  tabPanel("Automobile",
+                           fluidPage(fluidRow(
             column(6,
                    plotOutput(
-                       "car", width = "700px", height = "600px"
+                       "auto", width = "700px", height = "600px"
                    )),
             column(6,
-                   plotOutput(
-                       "kill", width = "700px", height = "600px"
+                   p("This is text for automobile"
+                       
                  ))
             
         ))
-    ))
+    ),
+    tabPanel("Country",
+               fluidPage(
+                   fluidRow(
+                       column(
+                           width = 4, 
+                           DT::dataTableOutput("testoutput")
+                       ), 
+                       column(
+                           width = 8, 
+                           leafletOutput("country", width = "1200px", height = "1000px")
+                       )
+                   )
+                   )
+)# tabPanel Country
 )
 )
+))
+
+
+
+
+
